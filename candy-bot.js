@@ -24,9 +24,10 @@ function handleErr(err) {
     process.exit(0);
 }
 
-function laBar() {
+function laBar(account) {
     const restClient = new RestClient('api.cobinhood.com', 443);
-    restClient.get('/v1/campaign/slot_machine/tokens?status=available', config.la_bar_api_key)
+    const api_key = (account === 1) ? config.a1_la_bar_api_key : config.a2_la_bar_api_key;
+    restClient.get('/v1/campaign/slot_machine/tokens?status=available', api_key)
     .then((r) => {
         if (r.result.tokens === null) {
             console.log('No available ticket.');
@@ -37,7 +38,7 @@ function laBar() {
             const header = {
                 'Content-Type': 'application/json',
                 'Content-Length': 2,
-                'authorization': config.la_bar_api_key,
+                'authorization': api_key,
                 'nonce': new Date().valueOf(),
                 'Origin': 'https://cobinhood.com'
             };
@@ -45,7 +46,6 @@ function laBar() {
                 console.log(r);
             }, handleErr);
         }
-
     }, handleErr);
 
 }
@@ -82,8 +82,11 @@ process.argv.forEach(args => {
     else if (args === '-is') {
         swap(true);
     }
-    else if (args === '-l') {
-        laBar();
+    else if (args === '-l1') {
+        laBar(1);
+    }
+    else if (args === '-l2') {
+        laBar(2)
     }
 });
 
