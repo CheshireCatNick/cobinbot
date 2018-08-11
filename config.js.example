@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    api_key: 'your api key'
+    a1_api_key: 'your sell ETH account api key',
+    a2_api_key: 'your buy ETH　account api key'
 };
