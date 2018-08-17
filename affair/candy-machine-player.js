@@ -6,7 +6,7 @@ const restClient = new RestClient('api.cobinhood.com', 443);
 class CandyMiachinePlayer {
     play(token) {
         restClient.get('/v1/campaign/slot_machine/tokens?status=available', 
-                    { authorization: token }
+            { authorization: token }
         ).then((result) => {
             if (!result.success) {
                 console.log('Cannot get ticket information.');
@@ -21,6 +21,7 @@ class CandyMiachinePlayer {
                 const header = {
                     'Content-Length': 2,
                     'authorization': token,
+                    'nonce': new Date().valueOf()
                 };
                 restClient.post('/v1/campaign/slot_machine/play', header, '').then((r) => {
                     console.log(r);

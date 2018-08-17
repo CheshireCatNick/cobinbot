@@ -9,9 +9,13 @@ class TokenRefresher {
         this.token = token;
         setInterval(() => {
             restClient.post('/v1/account/refresh_token', 
-                { authorization: this.token }, 
+                { 
+                    authorization: this.token,
+                    nonce: new Date().valueOf()
+                }, 
                 {}
             ).then((result) => {
+                console.log(result);
                 if (!result.success) {
                     console.log('Can not get refresh token.');
                     return;
@@ -22,5 +26,5 @@ class TokenRefresher {
         }, TokenRefresher.refreshPeriod);
     }
 }
-TokenRefresher.refreshPeriod = 60 * 1000;
+TokenRefresher.refreshPeriod = 30 * 1000;
 module.exports = TokenRefresher;
