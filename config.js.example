@@ -3,5 +3,5 @@
 module.exports = {
     a1_api_key: 'your sell ETH account api key',
     a2_api_key: 'your buy ETH　account api key',
-    la_bar_api_key: 'your la bar api key'
+    token: 'your token (received when logging in to cobinhood.com)'
 };
