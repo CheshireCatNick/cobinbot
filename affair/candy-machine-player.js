@@ -36,6 +36,6 @@ class CandyMiachinePlayer {
     }
     constructor() {}
 }
-const config = require('../config');
-const cmp = new CandyMiachinePlayer();
-cmp.play(config.token);
+//const config = require('../config');
+//const cmp = new CandyMiachinePlayer();
+//cmp.play(config.token);
