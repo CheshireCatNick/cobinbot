@@ -66,6 +66,9 @@ class CandyMiachinePlayer extends Affair {
         this.TAG = 'Candy Machine Player';
     }
 }
+
+module.exports = CandyMiachinePlayer;
+
 //const config = require('../config');
 //const cmp = new CandyMiachinePlayer();
 //cmp.play(config.token);

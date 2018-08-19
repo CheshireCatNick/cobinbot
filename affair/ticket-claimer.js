@@ -6,6 +6,12 @@ const restClient = new RestClient('api.cobinhood.com', 443);
 const Debug = require('../lib/debug');
 
 class TicketClaimer extends Affair {
+    
+    notify() {
+        let msg = 'This is a message from ' + this.TAG + '.\n\n';
+        msg += 'Your daily ticket is claimed with 1 cob point.';
+        this.mailSender.send(msg);
+    }
 
     claim(token) {
         const header = {
@@ -27,6 +33,7 @@ class TicketClaimer extends Affair {
             }
             else {
                 Debug.success([this.TAG, 'Ticket claimed.']);
+                this.notify();
             }
         }, super.handleErr);
     }
