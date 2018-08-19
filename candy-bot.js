@@ -3,6 +3,7 @@ const config = require('./config');
 const Debug = require('./lib/debug');
 const TokenRefresher = require('./affair/token-refresher');
 const TicketClaimer = require('./affair/ticket-claimer');
+const CandyMachinePlayer = require('./affair/candy-machine-player');
 
 const TAG = 'Candy Bot';
 /*
@@ -24,13 +25,12 @@ process.argv.forEach(args => {
 
 const tr = new TokenRefresher(config.token);
 const tc = new TicketClaimer();
+const cmp = new CandyMachinePlayer();
 
-// claim ticket every 24h
+tc.claim(tr.token);
+cmp.play(tr.token);
+// claim ticket and play candy machine every 24h
 setInterval(() => {
-    Debug.info([TAG, 'Claiming ticket.']);
     tc.claim(tr.token);
+    cmp.play(tr.token);
 }, 24 * 60 * 60 * 1000);
-
-setInterval(() => {
-    Debug.info([TAG, tr.token]);
-}, 30 * 1000);

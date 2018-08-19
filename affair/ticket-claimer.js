@@ -23,7 +23,7 @@ class TicketClaimer extends Affair {
             header,
             ''
         ).then((result) => {
-            console.log(result);
+            //console.log(result);
             if (!result.success) {
                 Debug.warning([this.TAG, 'Can not claim ticket.']);
                 return;

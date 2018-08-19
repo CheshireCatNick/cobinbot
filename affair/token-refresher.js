@@ -19,11 +19,11 @@ class TokenRefresher extends Affair {
                 }, 
                 {}
             ).then((result) => {
-                console.log(result);
                 if (!result.success) {
                     Debug.warning([this.TAG, 'Can not get refresh token.']);
                     return;
                 }
+                Debug.success([this.TAG, 'Successfully refresh token.']);
                 //console.log(result.result.account.token);
                 this.token = result.result.account.token;
             }, super.handleErr);

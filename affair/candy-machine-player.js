@@ -14,7 +14,6 @@ class CandyMiachinePlayer extends Affair {
         this.rewards.forEach(reward => {
             msg += reward + '\n';            
         });
-        console.log(msg);
         this.mailSender.send(msg);    
     }
 
@@ -25,6 +24,7 @@ class CandyMiachinePlayer extends Affair {
             'nonce': new Date().valueOf()
         };
         restClient.post('/v1/campaign/slot_machine/play', header, '').then((result) => {
+            //console.log(result);
             if (!result.success) {
                 Debug.warning([this.TAG, 'Can not play candy machine.']);
                 return;
@@ -32,13 +32,13 @@ class CandyMiachinePlayer extends Affair {
             const reward = result.result.reward;
             Debug.success([this.TAG, 'Successfully got reward: ' + reward]);
             this.rewards.push(reward);
-            if (ticketNum > 0) {
+            if (ticketNum - 1 > 0) {
                 setTimeout(() => {
                     this.requestReward(token, ticketNum - 1);   
                 }, 1000);
             }
             else {
-                this.notify(rewards);
+                this.notify();
             }
         });
     }
