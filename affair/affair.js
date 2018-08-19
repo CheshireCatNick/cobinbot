@@ -1,5 +1,7 @@
 'use strict';
 
+const MailSender = require('../lib/mail-sender');
+
 class Affair {
 
     handleErr(err) {
@@ -7,7 +9,9 @@ class Affair {
         process.exit(0);
     }
     
-    constructor(){}
+    constructor() {
+        this.mailSender = new MailSender();
+    }
 }
 
 module.exports = Affair;
