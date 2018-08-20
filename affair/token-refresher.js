@@ -4,6 +4,7 @@ const RestClient = require('../lib/rest-client');
 const fs = require('fs');
 const Affair = require('./affair');
 const Debug = require('../lib/debug');
+const config = require('../config');
 
 const restClient = new RestClient('api.cobinhood.com', 443);
 class TokenRefresher extends Affair {
@@ -22,10 +23,10 @@ class TokenRefresher extends Affair {
             }
         });
     }
-    constructor(token) {
+    constructor() {
         super();
         this.TAG = 'Token Refresher';
-        this.token = token;
+        this.token = config.token;
         setInterval(() => {
             restClient.post('/v1/account/refresh_token', 
                 { 
@@ -49,6 +50,5 @@ class TokenRefresher extends Affair {
 TokenRefresher.refreshPeriod = 30 * 1000;
 module.exports = TokenRefresher;
 
-//const config = require('../config');
-//const tr = new TokenRefresher(config.token);
+//const tr = new TokenRefresher();
 //tr.saveToken();
