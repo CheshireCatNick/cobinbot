@@ -49,6 +49,6 @@ class TokenRefresher extends Affair {
 TokenRefresher.refreshPeriod = 30 * 1000;
 module.exports = TokenRefresher;
 
-const config = require('../config');
-const tr = new TokenRefresher(config.token);
-tr.saveToken();
+//const config = require('../config');
+//const tr = new TokenRefresher(config.token);
+//tr.saveToken();
