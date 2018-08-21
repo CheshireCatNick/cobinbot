@@ -4,6 +4,7 @@ module.exports = {
     a1_api_key: 'your sell ETH account api key',
     a2_api_key: 'your buy ETH　account api key',
     token: 'your token (received when logging in to cobinhood.com)',
-    email: 'your email address',
-    password: 'your email password'
+    email_send: 'your send email address',
+    password: 'your email password',
+    email_recv: 'your receive email address'
 };
