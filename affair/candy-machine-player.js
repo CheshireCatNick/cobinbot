@@ -3,7 +3,7 @@
 const Affair = require('./affair');
 const RestClient = require('../lib/rest-client');
 const Debug = require('../lib/debug');
-
+const Cobinhood = require('node-cobinhood');
 const restClient = new RestClient('api.cobinhood.com', 443);
 
 class CandyMiachinePlayer extends Affair {
@@ -12,9 +12,25 @@ class CandyMiachinePlayer extends Affair {
         let msg = 'This is a message from ' + this.TAG + '.\n\n';
         msg += 'You won the following rewards:\n';
         this.rewards.forEach(reward => {
-            msg += reward + '\n';            
+            msg += `1 ${reward.reward} = ${reward.price} ETH + '\n'`;            
         });
         this.mailSender.send(msg);    
+    }
+
+    getPricePromise(pair) {
+        return new Promise((resolve, reject) => {
+            this.cobinhood.getOrderbook(pair + '-ETH').then((orderBook) => {
+                const highestBid = orderBook.bids[0].price.toNumber();
+                Debug.success([
+                    this.TAG, 
+                    `Successfully got reward: ${pair}, price: ${highestBid} ETH`
+                ]);
+                resolve({ reward: pair, price: highestBid });
+            }, (err) => {
+                console.log(err);
+                resolve({ reward: pair, price: 'Unknown' });
+            });
+        });
     }
 
     requestReward(token, ticketNum) {
@@ -31,14 +47,14 @@ class CandyMiachinePlayer extends Affair {
             }
             const reward = result.result.reward;
             Debug.success([this.TAG, 'Successfully got reward: ' + reward]);
-            this.rewards.push(reward);
+            this.rewards.push(this.getPricePromise(reward));
             if (ticketNum - 1 > 0) {
                 setTimeout(() => {
                     this.requestReward(token, ticketNum - 1);   
                 }, 1000);
             }
             else {
-                this.notify();
+                Promise.all(this.rewards).then((result) => this.notify());
             }
         });
     }
@@ -64,6 +80,10 @@ class CandyMiachinePlayer extends Affair {
     constructor() {
         super();
         this.TAG = 'Candy Machine Player';
+        this.cobinhood = new Cobinhood({
+            key: '',
+            disableWS: true
+        });
     }
 }
 
@@ -71,4 +91,3 @@ module.exports = CandyMiachinePlayer;
 
 //const config = require('../config');
 //const cmp = new CandyMiachinePlayer();
-//cmp.play(config.token);
