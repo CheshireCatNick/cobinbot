@@ -12,7 +12,7 @@ class CandyMiachinePlayer extends Affair {
         let msg = 'This is a message from ' + this.TAG + '.\n\n';
         msg += 'You won the following rewards:\n';
         this.rewards.forEach(reward => {
-            msg += `1 ${reward.reward} = ${reward.price} ETH + '\n'`;            
+            msg += `1 ${reward.reward} = ${reward.price} ETH\n`;            
         });
         this.mailSender.send(msg);    
     }
@@ -46,7 +46,6 @@ class CandyMiachinePlayer extends Affair {
                 return;
             }
             const reward = result.result.reward;
-            Debug.success([this.TAG, 'Successfully got reward: ' + reward]);
             this.rewards.push(this.getPricePromise(reward));
             if (ticketNum - 1 > 0) {
                 setTimeout(() => {
@@ -54,7 +53,10 @@ class CandyMiachinePlayer extends Affair {
                 }, 1000);
             }
             else {
-                Promise.all(this.rewards).then((result) => this.notify());
+                Promise.all(this.rewards).then((result) => {
+                    this.rewards = result;
+                    this.notify()
+                });
             }
         });
     }
