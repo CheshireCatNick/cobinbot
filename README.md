@@ -1,4 +1,4 @@
-# cobin-bot
+# cobinbot
 Bot for COBINHOOD exchange.
 
 ### Install
