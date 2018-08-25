@@ -1,5 +1,5 @@
-# candy-bot
-Trading bot for COBINHOOD candy machine.
+# cobin-bot
+Bot for COBINHOOD exchange.
 
 ### Install
 `npm install`
