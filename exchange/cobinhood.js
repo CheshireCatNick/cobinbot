@@ -4,22 +4,33 @@ const CobinhoodClient = require('node-cobinhood');
 const config = require('../config');
 const RestClient = require('../lib/rest-client');
 const OrderBook = require('./order-book');
+const Debug = require('../lib/debug');
+
+const TAG = 'Cobinhood';
 
 class Cobinhood {
     
     setClientCallback() {
         this.client.on('open', () => {
-            this.client.subscribeOrderbook('ETH-USDT', '1E-2', (msg) => {
-                this.orderBook.update(msg);
-            });
-
-
-
+            for (let pair of this.subscribedPairs) {
+                this.client.subscribeOrderbook(pair.symbol, pair.precision, (msg) => {
+                    this.orderBooks[pair.symbol].update(msg);
+                }).then(() => {
+                    Debug.success([TAG, `Successfully subscribed to ${pair.symbol}`]);
+                }).catch((err) => {
+                    Debug.warning([TAG, err]);
+                    process.exit(0);
+                });
+            }
         });
     }
 
-    constructor() {
-        this.orderBook = new OrderBook();
+    constructor(subscribedPairs) {
+        this.subscribedPairs = subscribedPairs;
+        this.orderBooks = {};
+        for (let pair of subscribedPairs) {
+            this.orderBooks[pair.symbol] = new OrderBook();
+        }
         this.client = new CobinhoodClient({
             'key': config.a1_api_key 
         });
@@ -27,8 +38,7 @@ class Cobinhood {
     }
 }
 
-const c = new Cobinhood();
-setInterval(() => {
-    console.log('la', c.orderBook.getLowestAsk());
-    console.log('hb', c.orderBook.getHighestBid());
-}, 3000);
+module.exports = Cobinhood;
+
+//const c = new Cobinhood();
+
