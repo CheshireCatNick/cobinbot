@@ -9,6 +9,7 @@ class BasicStrategy {
         const order = {
             pair: 'ETH-USDT',
             // positive to buy ETH, negative to sell
+            // amount of ETH
             amount: 1
         }
         return (Math.random() < 0.5) ? order : undefined;
@@ -18,8 +19,8 @@ class BasicStrategy {
         // period in second
         this.period = 3;
         this.subscribedPairs = [
-            { symbol: 'ETH-USDT', precision: '1E-2' },
-            { symbol: 'BTC-USDT', precision: '1E-1' }
+            { name: 'ETH-USDT', precision: '1E-2' },
+            { name: 'BTC-USDT', precision: '1E-1' }
         ];
         // user-defined variable
 
