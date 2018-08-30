@@ -3,7 +3,7 @@
 class BasicStrategy {
 
     // must have
-    decide(orderBooks) {
+    decide(orderBooks, wallet) {
 
         //console.log(orderBooks['ETH-USDT']);
         const order = {
