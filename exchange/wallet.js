@@ -1,5 +1,6 @@
 'use strict';
 
+const Debug = require('../lib/debug');
 class Wallet {
 
     withdraw(asset, amount) {
@@ -32,6 +33,11 @@ class Wallet {
     }
 
     constructor(balance) {
+        this.TAG = 'Wallet';
+        if (balance === undefined) {
+            Debug.warning([this.TAG, 'Balance undefined.']);
+            process.exit(0);
+        }
         this.balance = balance;
     }
 }
