@@ -8,7 +8,7 @@ Cobinbot is a general purpose bot which supports the following features:
 - Claim candy machine tickets with cob point.
 - Play candy machine.
 - Swap assets with two accounts for weekly mission or trading contest.
-- Claim cob points. (Thanks to [Kordan Ou](https://github.com/hitripod).)
+- Claim cob points. (Contribution from [Kordan Ou](https://github.com/hitripod).)
 - Trading bot simulation. (TODO)
 - Trading bot with strategy. (TODO)
 
