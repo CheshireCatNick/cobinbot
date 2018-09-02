@@ -33,6 +33,7 @@ module.exports = Trader;
 const BasicStrategy = require('../strategty/basic-strategy');
 const bs = new BasicStrategy();
 const t = new Trader(bs, true);
+
 setInterval(() => {
     t.run();
     t.wallet.toString();
