@@ -10,33 +10,46 @@ const Debug = require('../lib/debug');
 class CobinhoodSimulator {
 
     // simulate: exchange process order
+    processLimitOrder() {
+        const isBuy = order.amount > 0;
+        const amount = Math.abs(order.amount);
+        const base = order.pair.split('-')[0];
+        const quote = order.pair.split('-')[1];
+        const quoteAmount = base * amount;
+        // check price
+        const orderBooks = this.cobinhood.orderBooks;
+        console.log(order.price, orderBooks[order.pair].getLowestAsk());
+        if ((isBuy && order.price < orderBooks[order.pair].getLowestAsk().price) ||
+            (!isBuy && order.price > orderBooks[order.pair].getHighestBid().price)) {
+            return false;
+        } 
+        // execute order
+        if (isBuy) {
+            this.wallet.deposit(base, amount);
+        }
+        else {
+            this.wallet.deposit(quote, quoteAmount);
+        }
+        order.onOrderStateChanged({
+            status: 'filled'
+        });
+        return true;
+    }
+    processMarketOrder() {
+
+    }
     processOrders() {
         this.orders.forEach((order, index, array) => {
-            const isBuy = order.amount > 0;
-            const amount = Math.abs(order.amount);
-            const base = order.pair.split('-')[0];
-            const quote = order.pair.split('-')[1];
-            const quoteAmount = base * amount;
-            // check price
-            const orderBooks = this.cobinhood.orderBooks;
-            console.log(order.price, orderBooks[order.pair].getLowestAsk());
-            if ((isBuy && order.price < orderBooks[order.pair].getLowestAsk().price) ||
-                (!isBuy && order.price > orderBooks[order.pair].getHighestBid().price)) {
-                return;
+            if (order.type === 'limit' && this.processLimitOrder(order)) {
+                // remove order from orders
+                array.splice(index, 1);
+                Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
+            }
+            else if (order.type === 'market' && this.processMarketOrder(order)) {
+                // remove order from orders
+                array.splice(index, 1);
+                Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
             } 
-            // execute order
-            if (isBuy) {
-                this.wallet.deposit(base, amount);
-            }
-            else {
-                this.wallet.deposit(quote, quoteAmount);
-            }
-            // remove order from orders
-            array.splice(index, 1);
-            Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
-            order.onOrderStateChanged({
-                status: 'filled'
-            });
         });
     }
 
