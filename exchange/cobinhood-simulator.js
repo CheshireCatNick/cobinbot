@@ -11,7 +11,7 @@ class CobinhoodSimulator {
 
     // simulate: exchange process order
     processOrders() {
-        this.orders.forEach(order => {
+        this.orders.forEach((order, index, array) => {
             const isBuy = order.amount > 0;
             const amount = Math.abs(order.amount);
             const base = order.pair.split('-')[0];
@@ -32,6 +32,7 @@ class CobinhoodSimulator {
                 this.wallet.deposit(quote, quoteAmount);
             }
             // remove order from orders
+            array.splice(index, 1);
             Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
             order.onOrderStateChanged({
                 status: 'filled'
@@ -41,6 +42,7 @@ class CobinhoodSimulator {
 
     // simulate: put order on order book
     makeOrder(order) {
+        console.log('order', order);
         // check wallet balance
         const isBuy = order.amount > 0;
         const amount = Math.abs(order.amount);
@@ -75,7 +77,7 @@ class CobinhoodSimulator {
         this.cobinhood = new Cobinhood(subscribedPairs);
         this.orderBooks = this.cobinhood.orderBooks;
         // simulate 
-        this.wallet = new Wallet({ ETH: 100, USDT: 1000 });
+        this.wallet = new Wallet({ ETH: 100, USDT: 30000 });
         this.orders = [];
         // execute order every 500 ms
         setInterval(() => {

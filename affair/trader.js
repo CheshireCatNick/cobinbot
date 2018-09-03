@@ -7,7 +7,7 @@ class Trader {
 
     run() {
         const orderBooks = this.cobinhood.orderBooks;
-        console.log(orderBooks);
+        //console.log(orderBooks);
         // other trading information
         const order = this.strategy.decide(orderBooks, this.wallet);
         if (order !== undefined) {
@@ -29,7 +29,7 @@ class Trader {
 }
 
 module.exports = Trader;
-
+/*
 const BasicStrategy = require('../strategty/basic-strategy');
 const bs = new BasicStrategy();
 const t = new Trader(bs, true);
@@ -38,3 +38,4 @@ setInterval(() => {
     t.run();
     t.wallet.toString();
 }, bs.period * 1000);
+*/
