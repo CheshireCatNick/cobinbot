@@ -10,74 +10,107 @@ const Debug = require('../lib/debug');
 class CobinhoodSimulator {
 
     // simulate: exchange process order
-    processLimitOrder() {
-        const isBuy = order.amount > 0;
+    processMarketOrder(order) {
         const amount = Math.abs(order.amount);
         const base = order.pair.split('-')[0];
         const quote = order.pair.split('-')[1];
         const quoteAmount = base * amount;
-        // check price
-        const orderBooks = this.cobinhood.orderBooks;
-        console.log(order.price, orderBooks[order.pair].getLowestAsk());
-        if ((isBuy && order.price < orderBooks[order.pair].getLowestAsk().price) ||
-            (!isBuy && order.price > orderBooks[order.pair].getHighestBid().price)) {
-            return false;
-        } 
-        // execute order
+        const isBuy = order.amount > 0;
+
+        const orderBook = (isBuy) ? 
+            this.cobinhood.orderBooks[order.pair].getRaw().asks :
+            this.cobinhood.orderBooks[order.pair].getRaw().bids;
+        let amount = Math.abs(order.amount);
+        let k = 0;
+        let costGain = 0;
+        while (amount > 0) {
+            const d = orderBook[k];
+            if (amount > d.size) {
+                amount -= d.size;
+                costGain += d.size * d.price;
+                k++;
+                continue;
+            }
+            costGain += amount * d.price;
+        }
         if (isBuy) {
-            this.wallet.deposit(base, amount);
+            if (this.wallet.withdraw())
+            this.wallet.deposit(order.amount);
+            order.onOrderMade({
+
+            });
+            order.onOrderStateChanged({
+
+            });
         }
-        else {
-            this.wallet.deposit(quote, quoteAmount);
+        else if (!isBuy && this.wallet.withdraw()) {
+
         }
-        order.onOrderStateChanged({
-            status: 'filled'
-        });
-        return true;
-    }
-    processMarketOrder() {
+
+
+
+
 
     }
-    processOrders() {
+    processLimitOrders() {
         this.orders.forEach((order, index, array) => {
-            if (order.type === 'limit' && this.processLimitOrder(order)) {
-                // remove order from orders
-                array.splice(index, 1);
-                Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
-            }
-            else if (order.type === 'market' && this.processMarketOrder(order)) {
-                // remove order from orders
-                array.splice(index, 1);
-                Debug.success([this.TAG, `Execute order: ${order.ID}` ]);
+            const isBuy = order.amount > 0;
+            const amount = Math.abs(order.amount);
+            const base = order.pair.split('-')[0];
+            const quote = order.pair.split('-')[1];
+            const quoteAmount = base * amount;
+            // check price
+            const orderBooks = this.cobinhood.orderBooks;
+            console.log(order.price, orderBooks[order.pair].getLowestAsk());
+            if ((isBuy && order.price < orderBooks[order.pair].getLowestAsk().price) ||
+                (!isBuy && order.price > orderBooks[order.pair].getHighestBid().price)) {
+                return;
             } 
+            // execute order
+            if (isBuy) {
+                this.wallet.deposit(base, amount);
+            }
+            else {
+                this.wallet.deposit(quote, quoteAmount);
+            }
+            order.onOrderStateChanged({
+                status: 'filled'
+            });
+            array.splice(index, 1);
+            Debug.success([this.TAG, `Execute order: ${order.ID}`]);
         });
     }
 
     // simulate: put order on order book
     makeOrder(order) {
         console.log('order', order);
-        // check wallet balance
-        const isBuy = order.amount > 0;
-        const amount = Math.abs(order.amount);
-        const base = order.pair.split('-')[0];
-        const quote = order.pair.split('-')[1];
-        const quoteAmount = order.price * amount;
+        if (order.type === 'limit') {
+            // check wallet balance
+            const isBuy = order.amount > 0;
+            const amount = Math.abs(order.amount);
+            const base = order.pair.split('-')[0];
+            const quote = order.pair.split('-')[1];
+            const quoteAmount = order.price * amount;
 
-        if ((isBuy && this.wallet.withdraw(quote, quoteAmount)) || 
-            (!isBuy && this.wallet.withdraw(base, amount))) {
-            order.ID = '' + this.orders.length;
-            order.onOrderMade({
-                status: 'success',
-                orderID: order.ID
-            })
-            this.orders.push(order);
+            if ((isBuy && this.wallet.withdraw(quote, quoteAmount)) || 
+                (!isBuy && this.wallet.withdraw(base, amount))) {
+                order.ID = '' + this.orders.length;
+                order.onOrderMade({
+                    status: 'success',
+                    orderID: order.ID
+                })
+                this.orders.push(order);
+            }
+            else {
+                order.onOrderMade({
+                    status: 'failed',
+                    msg: 'Balance not enough.'
+                });
+            }
         }
-        else {
-            order.onOrderMade({
-                status: 'failed',
-                msg: 'Balance not enough.'
-            });
-        }
+        else if (order.type === 'market') {
+            this.processMarketOrder(order);
+        }    
     }
 
     // simulate: exchange maintain wallet
@@ -94,7 +127,7 @@ class CobinhoodSimulator {
         this.orders = [];
         // execute order every 500 ms
         setInterval(() => {
-            this.processOrders();
+            this.processLimitOrders();
         }, 500);
     }
 }
