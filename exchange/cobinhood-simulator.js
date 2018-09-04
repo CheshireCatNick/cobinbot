@@ -34,23 +34,38 @@ class CobinhoodSimulator {
             costGain += amount * d.price;
         }
         if (isBuy) {
-            if (this.wallet.withdraw())
-            this.wallet.deposit(order.amount);
-            order.onOrderMade({
+            if (this.wallet.withdraw(quote, costGain)) {
+                this.wallet.deposit(base, order.amount);
+                order.onOrderMade({
+    
+                });
+                order.onOrderStateChanged({
+    
+                });
 
-            });
-            order.onOrderStateChanged({
+            }
+            else {
+                order.onOrderMade({
 
-            });
+                });
+            }
         }
-        else if (!isBuy && this.wallet.withdraw()) {
+        else if (!isBuy) {
+            if (this.wallet.withdraw(base, order.amount)) {
+                this.wallet.deposit(base, order.amount);
+                order.onOrderMade({
+    
+                });
+                order.onOrderStateChanged({
+    
+                });
+            }
+            else {
+                order.onOrderMade({
 
+                });
+            }
         }
-
-
-
-
-
     }
     processLimitOrders() {
         this.orders.forEach((order, index, array) => {
