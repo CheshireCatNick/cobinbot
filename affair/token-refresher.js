@@ -47,7 +47,7 @@ class TokenRefresher extends Affair {
         }, TokenRefresher.refreshPeriod);
     }
 }
-TokenRefresher.refreshPeriod = 10 * 60 * 1000;
+TokenRefresher.refreshPeriod = 55 * 60 * 1000;
 module.exports = TokenRefresher;
 
 //const tr = new TokenRefresher();
