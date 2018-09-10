@@ -11,7 +11,7 @@ class CobinhoodSimulator {
 
     // simulate: exchange process order
     processMarketOrder(order) {
-        const amount = Math.abs(order.amount);
+        let amount = Math.abs(order.amount);
         const base = order.pair.split('-')[0];
         const quote = order.pair.split('-')[1];
         const quoteAmount = base * amount;
@@ -20,10 +20,11 @@ class CobinhoodSimulator {
         const orderBook = (isBuy) ? 
             this.cobinhood.orderBooks[order.pair].getRaw().asks :
             this.cobinhood.orderBooks[order.pair].getRaw().bids;
-        let amount = Math.abs(order.amount);
+
         let k = 0;
         let costGain = 0;
         while (amount > 0) {
+            console.log(amount);
             const d = orderBook[k];
             if (amount > d.size) {
                 amount -= d.size;
@@ -32,11 +33,15 @@ class CobinhoodSimulator {
                 continue;
             }
             costGain += amount * d.price;
+            amount -= amount;
         }
+        console.log('costgain: ', costGain);
+        console.log('amount: ', amount);
         if (isBuy) {
             if (this.wallet.withdraw(quote, costGain)) {
                 this.wallet.deposit(base, order.amount);
                 order.onOrderMade({
+                    status: 'success'
     
                 });
                 order.onOrderStateChanged({
@@ -46,14 +51,17 @@ class CobinhoodSimulator {
             }
             else {
                 order.onOrderMade({
+                    status: 'failed'
+                    
 
                 });
             }
         }
         else if (!isBuy) {
-            if (this.wallet.withdraw(base, order.amount)) {
-                this.wallet.deposit(base, order.amount);
+            if (this.wallet.withdraw(base, -order.amount)) {
+                this.wallet.deposit(quote, costGain);
                 order.onOrderMade({
+                    status: 'success'
     
                 });
                 order.onOrderStateChanged({
@@ -62,6 +70,7 @@ class CobinhoodSimulator {
             }
             else {
                 order.onOrderMade({
+                    status: 'failed'
 
                 });
             }

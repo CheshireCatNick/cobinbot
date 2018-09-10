@@ -55,21 +55,21 @@ class RiskControlStrategy {
         else if (ratio < 1 - this.threshold) {
             // buy ETH
             // make market order
-            order.amount = this.findBuyAmount(orderBook.getRaw(), wallet);
+            order.amount = this.findBuyAmount(orderBook.getRaw().asks, wallet);
             return order;
         }
         return undefined;
     }
-    findBuyAmount(orderBook, wallet) {
+    findBuyAmount(asks, wallet) {
         let amount = 0;
         let ETH = wallet.balance.ETH;
         let USDT = wallet.balance.USDT;
-        const price = orderBook.asks[0].price;
+        const price = asks[0].price;
         const ratio = ETH * price / USDT;
         let k = 0;
         // make ratio = 1
         while (true) {
-            const d = orderBook[k];
+            const d = asks[k];
             const needToBuy = (USDT - ETH * d.price) / (2 * d.price);
             if (needToBuy > d.size) {
                 // buy all of d
