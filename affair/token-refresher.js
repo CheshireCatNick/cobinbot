@@ -9,7 +9,7 @@ const config = require('../config');
 
 const restClient = new RestClient('api.cobinhood.com', 443);
 class TokenRefresher extends Affair {
-    
+
     saveToken() {
         config.token = this.token;
         let configFile = "'use strict';\n\n";
@@ -43,6 +43,7 @@ class TokenRefresher extends Affair {
             if (!result.success) {
                 Debug.warning([this.TAG, 'Can not get refresh token. Retrying...']);
                 this.refresh();
+                return;
             }
             Debug.success([this.TAG, 'Successfully refresh token.']);
             //console.log(result.result.account.token);
@@ -61,8 +62,8 @@ class TokenRefresher extends Affair {
         this.refresh();
     }
 }
-// refresh token 5 mins earlier than expiration time
-TokenRefresher.earlierTime = 5 * 60 * 1000;
+// refresh token 10 mins earlier than expiration time
+TokenRefresher.earlierTime = 10 * 60 * 1000;
 module.exports = TokenRefresher;
 
 //const tr = new TokenRefresher();
