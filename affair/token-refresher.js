@@ -46,8 +46,10 @@ class TokenRefresher extends Affair {
                 if (this.retryCount === TokenRefresher.maxRetryCount) {
                     return;
                 }
-                Debug.warning([this.TAG, 'Can not get refresh token. Retrying...']);
-                this.refresh();
+                setTimeout(() => {
+                    Debug.warning([this.TAG, 'Can not get refresh token. Retrying...']);
+                    this.refresh();
+                }, TokenRefresher.retryTime);
                 return;
             }
             Debug.success([this.TAG, 'Successfully refresh token.']);
@@ -71,6 +73,8 @@ class TokenRefresher extends Affair {
 // refresh token 10 mins earlier than expiration time
 TokenRefresher.earlierTime = 10 * 60 * 1000;
 TokenRefresher.maxRetryCount = 3;
+// retry after 1 min
+TokenRefresher.retryTime = 60 * 1000;
 module.exports = TokenRefresher;
 
 //const tr = new TokenRefresher();
