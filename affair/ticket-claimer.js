@@ -19,7 +19,7 @@ class TicketClaimer extends Affair {
             nonce: new Date().valueOf(),
             'Content-Length': 2,
         };
-        restClient.post('/v1/campaign/events/cob-point/redemption_cob_point_daily',
+        restClient.post('/v1/campaign/events/cob-point/daily_special_ops',
             header,
             ''
         ).then((result) => {
