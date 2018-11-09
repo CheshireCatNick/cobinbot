@@ -6,6 +6,8 @@ const Affair = require('./affair');
 const Debug = require('../lib/debug');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const puppeteer = require('puppeteer');
+require('../lib/fp');
 
 const restClient = new RestClient('api.cobinhood.com', 443);
 class TokenRefresher extends Affair {
@@ -62,12 +64,52 @@ class TokenRefresher extends Affair {
         }, super.handleErr);
     }
 
+    async getToken() {
+        // return config.token;
+        const browser = await puppeteer.launch({headless: false});
+        const page = await browser.newPage();
+        await page.setViewport({width: 1600, height: 900});
+        await page.goto('https://cobinhood.com');
+        console.log('Connected');
+        await page.keyboard.press('Escape');
+        await page.waitFor(1000);
+        await page.click('#desktop-header-login');
+        page.on('dialog', async (dialog) => {
+            console.log(dialog);
+            dialog.accept();
+
+
+            await page.type('input[type=email]', 'st945306@gmail.com', { delay: 20 });
+            await page.type('input[type=password]', 'test comment', { delay: 20 });
+
+
+        });  
+        
+
+        await page.waitForNavigation({timeout: 0});
+        const cookies = await page.cookies();
+        await browser.close();
+        const token = getToken(cookies);
+        console.log(token);
+        function getToken(cookies) {
+            for (let cookie of cookies) {
+                if (cookie.name == 'Authorization') {
+                    return cookie.value;
+                }
+            }
+        }
+        return token;              
+    }
+
+    async start() {
+        this.token = await this.getToken();
+        this.retryCount = 0;
+        this.refresh();
+    }
+
     constructor() {
         super();
         this.TAG = 'Token Refresher';
-        this.token = config.token;
-        this.retryCount = 0;
-        this.refresh();
     }
 }
 // refresh token 10 mins earlier than expiration time

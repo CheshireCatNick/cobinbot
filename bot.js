@@ -1,7 +1,7 @@
 'use strict';
 const TokenRefresher = require('./affair/token-refresher');
 const TicketClaimer = require('./affair/ticket-claimer');
-const COBPointClaimer = require('./affair/cob-point-claimer.js');
+const COBPointClaimer = require('./affair/cob-point-claimer');
 const CandyMachinePlayer = require('./affair/candy-machine-player');
 
 const TAG = 'Bot';
