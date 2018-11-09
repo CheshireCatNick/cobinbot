@@ -16,7 +16,6 @@ class RiskControlStrategy {
     }
     // must have
     onOrderStateChanged(result) {
-        console.log(result);
         if (result.status === 'filled') {
             this.hasUnfilledOrder = false;
         }
@@ -45,17 +44,12 @@ class RiskControlStrategy {
             onOrderMade: this.onOrderMade,
             onOrderStateChanged: this.onOrderStateChanged
         };
-        if (ratio > 1 + this.threshold) {
-            // sell ETH
-
-            order.amount = -wallet.balance.ETH * (ratio - 1);
-            order.price = orderBook.getHighestBid().price;
+        if (ratio < 1 - this.threshold) {
+            order.amount = this.findBuyAmount(orderBook.getRaw().asks, wallet);
             return order;
         }
-        else if (ratio < 1 - this.threshold) {
-            // buy ETH
-            // make market order
-            order.amount = this.findBuyAmount(orderBook.getRaw().asks, wallet);
+        else if (ratio > 1 + this.threshold) {
+            order.amount = this.findSellAmount(orderBook.getRaw().bids, wallet);
             return order;
         }
         return undefined;
@@ -83,6 +77,30 @@ class RiskControlStrategy {
             return amount;
         }
     }
+    findSellAmount(bids, wallet) {
+        let amount = 0;
+        let ETH = wallet.balance.ETH;
+        let USDT = wallet.balance.USDT;
+        const price = asks[0].price;
+        const ratio = ETH * price / USDT;
+        let k = 0;
+        // make ratio = 1
+        while (true) {
+            const d = asks[k];
+            const needToBuy = (USDT - ETH * d.price) / (2 * d.price);
+            if (needToBuy > d.size) {
+                // buy all of d
+                amount += d.size;
+                USDT -= d.size * d.price;
+                ETH += d.size;
+                k++;
+                continue;
+            }
+            amount += needToBuy;
+            return amount;
+        }
+
+    }
     constructor() {
         // must-have
 
@@ -93,7 +111,7 @@ class RiskControlStrategy {
             { name: 'ETH-USDT', precision: '1E-2' }
         ];
         // user-defined
-        this.threshold = 0.001;
+        this.threshold = 0.005;
         this.hasUnfilledOrder = false;
 
 

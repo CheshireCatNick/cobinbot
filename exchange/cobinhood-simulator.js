@@ -42,18 +42,14 @@ class CobinhoodSimulator {
                 this.wallet.deposit(base, order.amount);
                 order.onOrderMade({
                     status: 'success'
-    
                 });
                 order.onOrderStateChanged({
-    
+                    status: 'filled'
                 });
-
             }
             else {
                 order.onOrderMade({
                     status: 'failed'
-                    
-
                 });
             }
         }
@@ -62,16 +58,14 @@ class CobinhoodSimulator {
                 this.wallet.deposit(quote, costGain);
                 order.onOrderMade({
                     status: 'success'
-    
                 });
                 order.onOrderStateChanged({
-    
+                    status: 'filled'
                 });
             }
             else {
                 order.onOrderMade({
                     status: 'failed'
-
                 });
             }
         }
