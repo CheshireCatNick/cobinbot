@@ -1,8 +1,11 @@
 'use strict';
 
 module.exports = {
+    account: 'your cobinhood account email',
+    password: your cobinhood account password',
     a1_api_key: 'your sell ETH account api key',
     a2_api_key: 'your buy ETH　account api key',
+    useConfigToken: true,
     token: 'your token (received when logging in to cobinhood.com)',
     email_send: 'your send email address',
     password: 'your email password',

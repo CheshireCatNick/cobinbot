@@ -65,26 +65,28 @@ class TokenRefresher extends Affair {
     }
 
     async getToken() {
-        // return config.token;
-        const browser = await puppeteer.launch({headless: false});
+        if (config.useConfigToken) {
+            return config.token;
+        }
+        const browser = await puppeteer.launch({
+            //executablePath: 'google-chrome',
+            headless: false, 
+            args: ['--disable-notifications', '--start-fullscreen']
+        });
         const page = await browser.newPage();
-        await page.setViewport({width: 1600, height: 900});
+        await page.setViewport({
+            width: 1366, 
+            height: 768
+        });
         await page.goto('https://cobinhood.com');
-        console.log('Connected');
+        console.log('Browser is opened');
         await page.keyboard.press('Escape');
         await page.waitFor(1000);
         await page.click('#desktop-header-login');
-        page.on('dialog', async (dialog) => {
-            console.log(dialog);
-            dialog.accept();
-
-
-            await page.type('input[type=email]', 'st945306@gmail.com', { delay: 20 });
-            await page.type('input[type=password]', 'test comment', { delay: 20 });
-
-
-        });  
-        
+        await page.waitFor(1000);
+         
+        await page.type('input[name=email]', config.account, { delay: 100 });
+        await page.type('input[name=password]', config.password, { delay: 100 });
 
         await page.waitForNavigation({timeout: 0});
         const cookies = await page.cookies();
