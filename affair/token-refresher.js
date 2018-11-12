@@ -17,7 +17,13 @@ class TokenRefresher extends Affair {
         let configFile = "'use strict';\n\n";
         configFile += 'module.exports = {\n';
         for (let key in config) {
-            configFile += `\t${key}: '${config[key]}',\n`;
+            if (typeof config[key] === 'string') {
+                config[key] = config[key].replace(/\\/g, '\\\\');
+                configFile += `\t${key}: '${config[key]}',\n`;
+            }
+            else {
+                configFile += `\t${key}: ${config[key]},\n`;
+            }
         }
         configFile += '};\n';
         fs.writeFile('config.js', configFile, (err) => {
@@ -69,7 +75,8 @@ class TokenRefresher extends Affair {
             return config.token;
         }
         const browser = await puppeteer.launch({
-            //executablePath: 'google-chrome',
+            executablePath: config.chromePath,
+            userDataDir: config.userDataDir,
             headless: false, 
             args: ['--disable-notifications', '--start-fullscreen']
         });
@@ -79,28 +86,23 @@ class TokenRefresher extends Affair {
             height: 768
         });
         await page.goto('https://cobinhood.com');
-        console.log('Browser is opened');
+        Debug.success([this.TAG, 'Already logged in.']);
         await page.keyboard.press('Escape');
         await page.waitFor(1000);
-        await page.click('#desktop-header-login');
-        await page.waitFor(1000);
-         
-        await page.type('input[name=email]', config.account, { delay: 100 });
-        await page.type('input[name=password]', config.password, { delay: 100 });
-
-        await page.waitForNavigation({timeout: 0});
+        try {
+            await page.click('#desktop-header-login');
+            await page.waitFor(1000);
+            await page.type('input[name=email]', config.account, { delay: 10 });
+            await page.type('input[name=password]', config.password, { delay: 10 });
+            await page.waitForNavigation({ timeout: 0 });
+        }
+        catch (err) {
+            Debug.info([this.TAG, 'Already logged in.']);
+        }
         const cookies = await page.cookies();
         await browser.close();
-        const token = getToken(cookies);
-        console.log(token);
-        function getToken(cookies) {
-            for (let cookie of cookies) {
-                if (cookie.name == 'Authorization') {
-                    return cookie.value;
-                }
-            }
-        }
-        return token;              
+        const cookie = cookies.find(cookie => cookie.name === 'Authorization');
+        return cookie.value;
     }
 
     async start() {
