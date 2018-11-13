@@ -86,7 +86,7 @@ class TokenRefresher extends Affair {
             height: 768
         });
         await page.goto('https://cobinhood.com');
-        Debug.success([this.TAG, 'Already logged in.']);
+        Debug.success([this.TAG, 'Browser opened.']);
         await page.keyboard.press('Escape');
         await page.waitFor(1000);
         try {
@@ -97,6 +97,7 @@ class TokenRefresher extends Affair {
             await page.waitForNavigation({ timeout: 0 });
         }
         catch (err) {
+            console.log(err);
             Debug.info([this.TAG, 'Already logged in.']);
         }
         const cookies = await page.cookies();
