@@ -96,6 +96,7 @@ class TokenRefresher extends Affair {
             await page.waitForNavigation({ timeout: 0 });
         }
         catch (err) {
+            console.log(err);
             Debug.info([this.TAG, 'Already logged in.']);
         }
         const cookies = await page.cookies();
