@@ -18,7 +18,6 @@ class TokenRefresher extends Affair {
         configFile += 'module.exports = {\n';
         for (let key in config) {
             if (typeof config[key] === 'string') {
-                config[key] = config[key].replace(/\\/g, '\\\\');
                 configFile += `\t${key}: '${config[key]}',\n`;
             }
             else {
@@ -86,7 +85,7 @@ class TokenRefresher extends Affair {
             height: 768
         });
         await page.goto('https://cobinhood.com');
-        Debug.success([this.TAG, 'Already logged in.']);
+        Debug.success([this.TAG, 'Browser opened.']);
         await page.keyboard.press('Escape');
         await page.waitFor(1000);
         try {
@@ -113,6 +112,7 @@ class TokenRefresher extends Affair {
 
     constructor() {
         super();
+        config.userDataDir = config.userDataDir.replace(/\\/g, '\\\\');
         this.TAG = 'Token Refresher';
     }
 }
